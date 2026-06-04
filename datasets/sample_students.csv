@@ -1,0 +1,11 @@
+student_id,gender,parental_education,lunch_type,test_preparation_course,study_time_hours,attendance_rate,math_score,reading_score,writing_score
+1,female,bachelor's degree,standard,completed,3.5,0.95,78,84,82
+2,male,some college,standard,none,2.0,0.88,67,70,68
+3,female,master's degree,standard,completed,4.2,0.98,92,95,94
+4,male,high school,free/reduced,none,1.5,0.79,55,59,57
+5,female,associate's degree,standard,completed,3.0,0.91,74,79,80
+6,male,some high school,free/reduced,none,1.2,0.72,49,53,51
+7,female,some college,standard,completed,3.8,0.94,85,89,88
+8,male,bachelor's degree,standard,none,2.7,0.86,71,73,70
+9,female,high school,free/reduced,completed,2.4,0.82,63,68,66
+10,male,associate's degree,standard,completed,3.1,0.90,76,75,74
