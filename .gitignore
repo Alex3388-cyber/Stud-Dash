@@ -1,0 +1,29 @@
+# Python cache and virtual environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Environment and local config
+.env
+.streamlit/secrets.toml
+
+# Data and model artifacts that can be large or machine-specific
+datasets/raw/*
+datasets/processed/*
+models/artifacts/*
+database/*.db
+database/*.sqlite
+database/*.sqlite3
+
+# Keep placeholder/documentation files
+!datasets/raw/.gitkeep
+!datasets/processed/.gitkeep
+!models/artifacts/.gitkeep
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
