@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a2e; margin: 0; padding: 0; }
+  .header { background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); color: #fff; padding: 32px 40px; }
+  .header h1 { margin: 0 0 4px; font-size: 24px; }
+  .header .subtitle { font-size: 13px; opacity: 0.75; }
+  .header .meta { font-size: 12px; opacity: 0.6; margin-top: 8px; }
+  .content { padding: 32px 40px; }
+  .section { margin-bottom: 32px; }
+  .section h2 { font-size: 16px; color: #0f3460; border-bottom: 2px solid #e8f0fe; padding-bottom: 6px; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #0f3460; color: #fff; padding: 8px 12px; text-align: left; }
+  td { padding: 7px 12px; border-bottom: 1px solid #e8f0fe; }
+  tr:nth-child(even) td { background: #f8faff; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi-card { background: #f0f4ff; border-left: 4px solid #0f3460; padding: 14px 16px; border-radius: 6px; }
+  .kpi-card .label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+  .kpi-card .value { font-size: 22px; font-weight: 700; color: #0f3460; margin: 4px 0 2px; }
+  .kpi-card .note { font-size: 11px; color: #888; }
+  .footer { background: #f0f4ff; padding: 16px 40px; font-size: 11px; color: #888; border-top: 1px solid #dde; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .badge-pass { background: #d1fae5; color: #065f46; }
+  .badge-fail { background: #fee2e2; color: #991b1b; }
+  .badge-risk { background: #fef3c7; color: #92400e; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>{{ title }}</h1>
+  <div class="subtitle">{{ subtitle }}</div>
+  <div class="meta">Generated: {{ generated_at }} | Dataset: {{ dataset_name }}</div>
+</div>
+<div class="content">
+  {{ body }}
+</div>
+<div class="footer">
+  Stud-Dash EDW Platform &bull; Confidential &bull; {{ generated_at }}
+</div>
+</body>
+</html>

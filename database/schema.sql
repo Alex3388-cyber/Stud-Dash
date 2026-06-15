@@ -36,3 +36,27 @@ CREATE TABLE IF NOT EXISTS prediction_history (
     recommendation TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- ETL monitoring: one row per pipeline run (Phase 2)
+CREATE TABLE IF NOT EXISTS etl_jobs (
+    job_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    dataset_name TEXT NOT NULL,
+    stage TEXT NOT NULL,
+    rows_in INTEGER,
+    rows_out INTEGER,
+    rows_rejected INTEGER DEFAULT 0,
+    duration_ms INTEGER,
+    status TEXT NOT NULL DEFAULT 'completed',
+    error_message TEXT,
+    started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Audit log: every significant user action (Phase 10)
+CREATE TABLE IF NOT EXISTS audit_events (
+    event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_type TEXT NOT NULL,
+    entity_name TEXT,
+    detail TEXT,
+    rows_affected INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

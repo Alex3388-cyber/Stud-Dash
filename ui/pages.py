@@ -213,11 +213,45 @@ def render_reports() -> None:
     render_reports_dashboard(data)
 
 
+from ui.dm_pages import (
+    render_data_warehouse,
+    render_etl_monitor,
+    render_data_quality,
+    render_kpi_dashboard,
+    render_explainability,
+    render_advanced_charts,
+    render_decision_support,
+    render_forecasting,
+    render_export_reports,
+    render_audit_log,
+)
+
 PAGE_RENDERERS = {
+    # Original 6 pages
     "Home": render_home,
     "Insights": render_insights,
     "Data Exploration": render_data_exploration,
     "Prediction": render_prediction,
     "Clustering": render_clustering,
     "Reports": render_reports,
+    # Phase 1 — Data Warehouse Architecture
+    "Data Warehouse": render_data_warehouse,
+    # Phase 2 — ETL Monitoring Dashboard
+    "ETL Monitor": render_etl_monitor,
+    # Phase 3 — Data Quality Dashboard
+    "Data Quality": render_data_quality,
+    # Phase 4 — Executive KPI Dashboard
+    "KPI Dashboard": render_kpi_dashboard,
+    # Phase 5 — Explainable AI
+    "Explainability": render_explainability,
+    # Phase 6 — Advanced Visualizations
+    "Advanced Charts": render_advanced_charts,
+    # Phase 7 — Decision Support
+    "Decision Support": render_decision_support,
+    # Phase 8 — Forecasting
+    "Forecasting": render_forecasting,
+    # Phase 9 — Export Reports
+    "Export Reports": render_export_reports,
+    # Phase 10 — Audit Log
+    "Audit Log": render_audit_log,
 }

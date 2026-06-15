@@ -280,3 +280,87 @@ def clear_all_saved_records() -> dict[str, int]:
         "rows_deleted": dataset_result["rows_deleted"],
         "predictions_deleted": prediction_count,
     }
+
+
+# ---------------------------------------------------------------------------
+# ETL monitoring (Phase 2)
+# ---------------------------------------------------------------------------
+
+def log_etl_job(
+    dataset_name: str,
+    stage: str,
+    rows_in: int,
+    rows_out: int,
+    rows_rejected: int,
+    duration_ms: int,
+    status: str = "completed",
+    error_message: str | None = None,
+) -> int:
+    """Record one ETL pipeline stage execution."""
+    initialize_database()
+    with get_connection() as connection:
+        cursor = connection.execute(
+            """
+            INSERT INTO etl_jobs
+                (dataset_name, stage, rows_in, rows_out, rows_rejected, duration_ms, status, error_message)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (dataset_name, stage, rows_in, rows_out, rows_rejected, duration_ms, status, error_message),
+        )
+        return int(cursor.lastrowid)
+
+
+def fetch_etl_jobs(limit: int = 50) -> pd.DataFrame:
+    """Return recent ETL job records."""
+    initialize_database()
+    with get_connection() as connection:
+        rows = connection.execute(
+            """
+            SELECT job_id, dataset_name, stage, rows_in, rows_out, rows_rejected,
+                   duration_ms, status, error_message, started_at
+            FROM etl_jobs
+            ORDER BY started_at DESC, job_id DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+    return pd.DataFrame([dict(r) for r in rows])
+
+
+# ---------------------------------------------------------------------------
+# Audit log (Phase 10)
+# ---------------------------------------------------------------------------
+
+def log_audit_event(
+    event_type: str,
+    entity_name: str | None = None,
+    detail: str | None = None,
+    rows_affected: int | None = None,
+) -> int:
+    """Record one audit event."""
+    initialize_database()
+    with get_connection() as connection:
+        cursor = connection.execute(
+            """
+            INSERT INTO audit_events (event_type, entity_name, detail, rows_affected)
+            VALUES (?, ?, ?, ?)
+            """,
+            (event_type, entity_name, detail, rows_affected),
+        )
+        return int(cursor.lastrowid)
+
+
+def fetch_audit_events(limit: int = 200) -> pd.DataFrame:
+    """Return recent audit events."""
+    initialize_database()
+    with get_connection() as connection:
+        rows = connection.execute(
+            """
+            SELECT event_id, event_type, entity_name, detail, rows_affected, created_at
+            FROM audit_events
+            ORDER BY created_at DESC, event_id DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+    return pd.DataFrame([dict(r) for r in rows])

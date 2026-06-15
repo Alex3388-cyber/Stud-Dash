@@ -16,12 +16,25 @@ from services.dataset_service import get_active_kpi_dataset, get_score_columns
 ASSETS_DIR = Path(__file__).resolve().parents[1] / "assets"
 
 NAV_ITEMS = [
+    # Core dashboard (original 6)
     "Home",
     "Insights",
     "Data Exploration",
     "Prediction",
     "Clustering",
     "Reports",
+    # Data Mining & Warehousing (Phase 1–5)
+    "Data Warehouse",
+    "ETL Monitor",
+    "Data Quality",
+    "KPI Dashboard",
+    "Explainability",
+    # Decision Intelligence (Phase 6–10)
+    "Advanced Charts",
+    "Decision Support",
+    "Forecasting",
+    "Export Reports",
+    "Audit Log",
 ]
 
 NAV_LABELS = {
@@ -31,6 +44,16 @@ NAV_LABELS = {
     "Prediction": "Prediction",
     "Clustering": "Clustering",
     "Reports": "Reports",
+    "Data Warehouse": "Data Warehouse",
+    "ETL Monitor": "ETL Monitor",
+    "Data Quality": "Data Quality",
+    "KPI Dashboard": "KPI Dashboard",
+    "Explainability": "Explainability",
+    "Advanced Charts": "Adv. Charts",
+    "Decision Support": "Decision Support",
+    "Forecasting": "Forecasting",
+    "Export Reports": "Export Reports",
+    "Audit Log": "Audit Log",
 }
 
 NAV_ICONS = {
@@ -40,6 +63,27 @@ NAV_ICONS = {
     "Prediction": "brain-circuit",
     "Clustering": "network",
     "Reports": "file-text",
+    # New pages use compact icon keys
+    "Data Warehouse": "database",
+    "ETL Monitor": "activity",
+    "Data Quality": "shield-check",
+    "KPI Dashboard": "trending-up",
+    "Explainability": "help-circle",
+    "Advanced Charts": "bar-chart",
+    "Decision Support": "lightbulb",
+    "Forecasting": "trending-up",
+    "Export Reports": "download",
+    "Audit Log": "list",
+}
+
+# Compact SVG paths for the new DM/DW pages (shorter than Lucide originals)
+COMPACT_ICON_PATHS = {
+    "trending-up": '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+    "help-circle": '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r=".5"/>',
+    "bar-chart": '<rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/>',
+    "lightbulb": '<path d="M9 21h6m-3-3v-3m0 0a6 6 0 1 0-6-6h0a6 6 0 0 0 6 6"/>',
+    "download": '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+    "list": '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
 }
 
 LUCIDE_ICON_PATHS = {
@@ -131,8 +175,12 @@ def get_custom_css_text(css_path: str) -> str:
 
 
 def lucide_icon(icon_name: str, class_name: str = "lucide-icon") -> str:
-    """Return inline SVG markup for a Lucide-style icon."""
-    paths = LUCIDE_ICON_PATHS.get(icon_name, LUCIDE_ICON_PATHS["activity"])
+    """Return inline SVG markup for a Lucide-style icon (compact or full)."""
+    paths = (
+        COMPACT_ICON_PATHS.get(icon_name)
+        or LUCIDE_ICON_PATHS.get(icon_name)
+        or LUCIDE_ICON_PATHS["activity"]
+    )
     return (
         f'<svg class="{class_name}" xmlns="http://www.w3.org/2000/svg" width="24" height="24" '
         f'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
@@ -260,31 +308,56 @@ def render_sidebar() -> str:
         unsafe_allow_html=True,
     )
 
-    navigation_markup = ['<nav class="sidebar-nav" aria-label="Dashboard navigation">']
-    for page in NAV_ITEMS:
-        active_class = " active" if page == selected_page else ""
-        page_url = f"?page={quote(page)}"
-        navigation_markup.append(
-            (
+    # Split navigation into 3 small blocks to stay under Streamlit's markdown
+    # character limit for sidebar content with inline SVG icons.
+    def _nav_block(items: list[str]) -> str:
+        markup = ['<nav class="sidebar-nav" aria-label="Dashboard navigation">']
+        for page in items:
+            active_class = " active" if page == selected_page else ""
+            page_url = f"?page={quote(page)}"
+            markup.append(
                 f'<a class="sidebar-nav-item{active_class}" href="{page_url}" target="_self">'
                 f'<span class="sidebar-nav-icon">{lucide_icon(NAV_ICONS[page])}</span>'
                 f'<span class="sidebar-nav-label">{escape(NAV_LABELS[page])}</span>'
                 f'<span class="sidebar-nav-arrow">{lucide_icon("chevron-right", "sidebar-arrow-icon")}</span>'
                 "</a>"
             )
-        )
-    navigation_markup.append("</nav>")
+        markup.append("</nav>")
+        return "".join(markup)
 
+    # Block 1: Core dashboard pages (original 6)
+    core_pages = [p for p in NAV_ITEMS if p in {
+        "Home", "Insights", "Data Exploration", "Prediction", "Clustering", "Reports"
+    }]
     st.sidebar.markdown(
-        '<div class="sidebar-section-label">Navigation</div>' + "".join(navigation_markup),
+        '<div class="sidebar-section-label">Core Dashboard</div>' + _nav_block(core_pages),
         unsafe_allow_html=True,
     )
+
+    # Block 2: Data Mining / Warehousing pages
+    dm_pages = [p for p in NAV_ITEMS if p in {
+        "Data Warehouse", "ETL Monitor", "Data Quality", "KPI Dashboard", "Explainability"
+    }]
+    st.sidebar.markdown(
+        '<div class="sidebar-section-label">Data Mining &amp; Warehouse</div>' + _nav_block(dm_pages),
+        unsafe_allow_html=True,
+    )
+
+    # Block 3: Decision Intelligence pages
+    di_pages = [p for p in NAV_ITEMS if p in {
+        "Advanced Charts", "Decision Support", "Forecasting", "Export Reports", "Audit Log"
+    }]
+    st.sidebar.markdown(
+        '<div class="sidebar-section-label">Decision Intelligence</div>' + _nav_block(di_pages),
+        unsafe_allow_html=True,
+    )
+
     st.sidebar.divider()
     st.sidebar.markdown(
         f"""
         <div class="sidebar-status-card">
-            <div>{lucide_icon("shield-check", "sidebar-status-icon")}<strong>System Online</strong></div>
-            <p>Data workflow, prediction, clustering, and reports are available.</p>
+            <div>{lucide_icon("shield-check", "sidebar-status-icon")}<strong>DM/DW Platform Online</strong></div>
+            <p>16 modules: warehouse, ETL, quality, KPIs, XAI, forecasting, reports, and audit active.</p>
             <div class="sidebar-data-pill">{lucide_icon("database", "sidebar-pill-icon")} SQLite connected</div>
         </div>
         """,
