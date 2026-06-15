@@ -213,7 +213,7 @@ def render_reports() -> None:
     render_reports_dashboard(data)
 
 
-from ui.dm_pages import (
+from ui.edw_pages import (
     render_data_warehouse,
     render_etl_monitor,
     render_data_quality,

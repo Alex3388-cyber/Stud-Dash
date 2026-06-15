@@ -78,26 +78,28 @@ def render_animated_kpi_component(cards: list[KpiCard]) -> None:
         f"""
         <style>
             :root {{
-                --text: #edf7ff;
-                --muted: #a8bad0;
-                --muted-2: #7f95ad;
-                --teal: #36e6c2;
-                --cyan: #65c7ff;
-                --violet: #9b7cff;
-                --amber: #ffd166;
-                --rose: #ff6b91;
-                --green: #48e69b;
-                --danger: #ff776d;
-                --radius: 8px;
+                --bg-1:    #18181b;
+                --bg-2:    #27272a;
+                --border:  #27272a;
+                --border-s:#3f3f46;
+                --text:    #fafafa;
+                --muted:   #a1a1aa;
+                --muted-2: #71717a;
+                --teal:    #2dd4bf;
+                --cyan:    #38bdf8;
+                --violet:  #a78bfa;
+                --amber:   #fbbf24;
+                --rose:    #fb7185;
+                --green:   #4ade80;
+                --danger:  #f87171;
+                --radius:  8px;
             }}
 
-            * {{
-                box-sizing: border-box;
-            }}
+            * {{ box-sizing: border-box; }}
 
             body {{
                 background: transparent;
-                font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+                font-family: Inter, "Segoe UI", system-ui, sans-serif;
                 line-height: 1.55;
                 margin: 0;
                 overflow: hidden;
@@ -114,12 +116,11 @@ def render_animated_kpi_component(cards: list[KpiCard]) -> None:
             }}
 
             .home-kpi-card {{
-                background:
-                    linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.045)),
-                    rgba(8, 18, 35, 0.68);
-                border: 1px solid rgba(182, 226, 255, 0.18);
+                background: var(--bg-1);
+                border: 1px solid var(--border);
+                border-left: 3px solid var(--teal);
                 border-radius: var(--radius);
-                box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+                box-shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.25);
                 display: flex;
                 flex-direction: column;
                 min-height: 128px;
@@ -127,110 +128,67 @@ def render_animated_kpi_component(cards: list[KpiCard]) -> None:
                 padding: 0.8rem;
                 position: relative;
                 transform: translateY(10px);
-                transition:
-                    border-color 180ms ease,
-                    box-shadow 180ms ease,
-                    transform 180ms ease,
-                    background 180ms ease;
-                animation: kpi-rise 560ms ease forwards;
+                transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+                animation: kpi-rise 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
             }}
 
-            .home-kpi-card:nth-child(2) {{ animation-delay: 70ms; }}
-            .home-kpi-card:nth-child(3) {{ animation-delay: 140ms; }}
-            .home-kpi-card:nth-child(4) {{ animation-delay: 210ms; }}
-            .home-kpi-card:nth-child(5) {{ animation-delay: 280ms; }}
-            .home-kpi-card:nth-child(6) {{ animation-delay: 350ms; }}
-            .home-kpi-card:nth-child(7) {{ animation-delay: 420ms; }}
+            .home-kpi-card:nth-child(2) {{ animation-delay: 60ms; }}
+            .home-kpi-card:nth-child(3) {{ animation-delay: 120ms; }}
+            .home-kpi-card:nth-child(4) {{ animation-delay: 180ms; }}
+            .home-kpi-card:nth-child(5) {{ animation-delay: 240ms; }}
+            .home-kpi-card:nth-child(6) {{ animation-delay: 300ms; }}
+            .home-kpi-card:nth-child(7) {{ animation-delay: 360ms; }}
 
-            .home-kpi-card::before {{
-                background: linear-gradient(90deg, var(--teal), var(--cyan), var(--amber));
-                content: "";
-                height: 3px;
-                left: 0;
-                position: absolute;
-                right: 0;
-                top: 0;
-            }}
+            .home-kpi-card::before {{ display: none !important; }}
 
             .home-kpi-card:hover {{
-                border-color: rgba(142, 230, 218, 0.55);
-                box-shadow: 0 28px 72px rgba(0, 0, 0, 0.46), 0 0 34px rgba(54, 230, 194, 0.24);
+                border-color: var(--border-s);
+                box-shadow: 0 4px 16px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.35);
                 transform: translateY(-2px);
             }}
 
-            .home-kpi-card.kpi-green::before {{ background: linear-gradient(90deg, var(--green), var(--teal)); }}
-            .home-kpi-card.kpi-rose::before,
-            .home-kpi-card.kpi-danger::before {{ background: linear-gradient(90deg, var(--rose), var(--danger)); }}
-            .home-kpi-card.kpi-violet::before {{ background: linear-gradient(90deg, var(--violet), var(--cyan)); }}
-            .home-kpi-card.kpi-amber::before {{ background: linear-gradient(90deg, var(--amber), var(--teal)); }}
-            .home-kpi-card.kpi-cyan::before {{ background: linear-gradient(90deg, var(--cyan), var(--teal)); }}
-            .home-kpi-card.kpi-teal::before {{ background: linear-gradient(90deg, var(--teal), var(--green)); }}
+            .home-kpi-card.kpi-green  {{ border-left-color: var(--green); }}
+            .home-kpi-card.kpi-rose,
+            .home-kpi-card.kpi-danger {{ border-left-color: var(--rose); }}
+            .home-kpi-card.kpi-violet {{ border-left-color: var(--violet); }}
+            .home-kpi-card.kpi-amber  {{ border-left-color: var(--amber); }}
+            .home-kpi-card.kpi-cyan   {{ border-left-color: var(--cyan); }}
+            .home-kpi-card.kpi-teal   {{ border-left-color: var(--teal); }}
 
-            .kpi-glow-ring {{
-                background:
-                    radial-gradient(circle at 18% 20%, rgba(54, 230, 194, 0.24), transparent 34%),
-                    radial-gradient(circle at 85% 8%, rgba(101, 199, 255, 0.18), transparent 30%);
-                inset: 0;
-                opacity: 0.88;
-                pointer-events: none;
-                position: absolute;
-            }}
-
-            .kpi-shine {{
-                background: linear-gradient(115deg, transparent 18%, rgba(255, 255, 255, 0.16) 48%, transparent 70%);
-                height: 160%;
-                left: -72%;
-                opacity: 0;
-                pointer-events: none;
-                position: absolute;
-                top: -30%;
-                transform: rotate(4deg);
-                width: 42%;
-            }}
-
-            .home-kpi-card:hover .kpi-shine {{
-                animation: kpi-shine 900ms ease;
-                opacity: 1;
-            }}
+            .kpi-glow-ring,
+            .kpi-shine {{ display: none !important; }}
 
             .kpi-icon,
             .home-kpi-card small,
             .home-kpi-card strong,
             .home-kpi-card em,
-            .kpi-progress-line {{
-                position: relative;
-                z-index: 1;
-            }}
+            .kpi-progress-line {{ position: relative; z-index: 1; }}
 
             .kpi-icon {{
                 align-items: center;
-                background: linear-gradient(145deg, rgba(54, 230, 194, 0.94), rgba(101, 199, 255, 0.86));
-                border: 1px solid rgba(255, 255, 255, 0.36);
-                border-radius: var(--radius);
-                box-shadow: 0 12px 28px rgba(54, 230, 194, 0.22);
-                color: #04101c;
+                background: var(--bg-2);
+                border-radius: 6px;
+                color: var(--teal);
                 display: flex;
-                font-size: 0.74rem;
-                font-weight: 900;
-                height: 34px;
+                font-size: 0.72rem;
+                font-weight: 700;
+                height: 32px;
                 justify-content: center;
-                margin-bottom: 0.48rem;
-                width: 34px;
+                margin-bottom: 0.5rem;
+                width: 32px;
             }}
 
-            .kpi-green .kpi-icon,
-            .kpi-teal .kpi-icon {{ background: linear-gradient(145deg, var(--green), var(--teal)); }}
-            .kpi-rose .kpi-icon,
-            .kpi-danger .kpi-icon {{ background: linear-gradient(145deg, var(--rose), var(--danger)); }}
-            .kpi-violet .kpi-icon {{ background: linear-gradient(145deg, var(--violet), var(--cyan)); }}
-            .kpi-amber .kpi-icon {{ background: linear-gradient(145deg, var(--amber), var(--teal)); }}
-            .kpi-cyan .kpi-icon {{ background: linear-gradient(145deg, var(--cyan), var(--teal)); }}
+            .kpi-green .kpi-icon, .kpi-teal .kpi-icon  {{ color: var(--green); }}
+            .kpi-rose .kpi-icon, .kpi-danger .kpi-icon {{ color: var(--rose); }}
+            .kpi-violet .kpi-icon {{ color: var(--violet); }}
+            .kpi-amber .kpi-icon  {{ color: var(--amber); }}
+            .kpi-cyan .kpi-icon   {{ color: var(--cyan); }}
 
             .home-kpi-card small {{
                 color: var(--muted);
                 display: block;
-                font-size: 0.68rem;
-                font-weight: 820;
+                font-size: 0.67rem;
+                font-weight: 600;
                 line-height: 1.25;
                 min-height: 1.45rem;
                 text-transform: uppercase;
@@ -239,12 +197,11 @@ def render_animated_kpi_component(cards: list[KpiCard]) -> None:
             .home-kpi-card strong {{
                 color: var(--text);
                 display: block;
-                font-size: 1.28rem;
-                font-weight: 840;
+                font-size: 1.3rem;
+                font-weight: 700;
                 line-height: 1.12;
-                margin: 0.16rem 0 0.2rem;
+                margin: 0.15rem 0 0.18rem;
                 overflow-wrap: anywhere;
-                text-shadow: 0 0 18px rgba(101, 199, 255, 0.14);
             }}
 
             .home-kpi-card em {{
@@ -252,21 +209,21 @@ def render_animated_kpi_component(cards: list[KpiCard]) -> None:
                 display: block;
                 font-size: 0.74rem;
                 font-style: normal;
-                line-height: 1.35;
+                line-height: 1.38;
                 min-height: 1.8rem;
             }}
 
             .kpi-progress-line {{
-                background: rgba(182, 226, 255, 0.12);
+                background: var(--bg-2);
                 border-radius: 999px;
-                height: 4px;
+                height: 3px;
                 margin-top: auto;
                 overflow: hidden;
             }}
 
             .kpi-progress-line span {{
-                animation: kpi-progress 1.3s ease forwards;
-                background: linear-gradient(90deg, var(--teal), var(--cyan), var(--amber));
+                animation: kpi-progress 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                background: var(--teal);
                 border-radius: inherit;
                 display: block;
                 height: 100%;
@@ -274,20 +231,15 @@ def render_animated_kpi_component(cards: list[KpiCard]) -> None:
                 transform-origin: left;
             }}
 
-            @keyframes kpi-rise {{
-                from {{
-                    opacity: 0;
-                    transform: translateY(10px);
-                }}
-                to {{
-                    opacity: 1;
-                    transform: translateY(0);
-                }}
-            }}
+            .kpi-green .kpi-progress-line span, .kpi-teal .kpi-progress-line span  {{ background: var(--green); }}
+            .kpi-rose .kpi-progress-line span, .kpi-danger .kpi-progress-line span {{ background: var(--rose); }}
+            .kpi-violet .kpi-progress-line span {{ background: var(--violet); }}
+            .kpi-amber .kpi-progress-line span  {{ background: var(--amber); }}
+            .kpi-cyan .kpi-progress-line span   {{ background: var(--cyan); }}
 
-            @keyframes kpi-shine {{
-                from {{ left: -72%; }}
-                to {{ left: 124%; }}
+            @keyframes kpi-rise {{
+                from {{ opacity: 0; transform: translateY(10px); }}
+                to   {{ opacity: 1; transform: translateY(0); }}
             }}
 
             @keyframes kpi-progress {{
@@ -295,36 +247,20 @@ def render_animated_kpi_component(cards: list[KpiCard]) -> None:
             }}
 
             @media (max-width: 1100px) {{
-                .home-kpi-grid {{
-                    grid-template-columns: repeat(2, minmax(0, 1fr));
-                }}
+                .home-kpi-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
             }}
 
             @media (max-width: 760px) {{
-                body {{
-                    overflow: auto;
-                }}
-                .home-kpi-grid {{
-                    grid-template-columns: 1fr;
-                }}
-                .home-kpi-card {{
-                    min-height: 122px;
-                    padding: 0.8rem;
-                }}
+                body {{ overflow: auto; }}
+                .home-kpi-grid {{ grid-template-columns: 1fr; }}
+                .home-kpi-card {{ min-height: 116px; }}
             }}
 
             @media (prefers-reduced-motion: reduce) {{
-                *,
-                *::before,
-                *::after {{
+                *, *::before, *::after {{
                     animation-duration: 0.01ms !important;
                     animation-iteration-count: 1 !important;
                     transition-duration: 0.01ms !important;
-                }}
-
-                .kpi-shine,
-                .kpi-glow-ring {{
-                    display: none !important;
                 }}
             }}
         </style>

@@ -26,6 +26,12 @@ def main() -> None:
     except Exception:
         st.warning("Database setup could not be completed. Saved records may be unavailable.")
 
+    try:
+        from database.pg_connection import init_db
+        init_db()
+    except Exception:
+        pass
+
     migrate_legacy_session_state()
     ensure_active_dataset_pipeline(show_spinner=False)
     load_custom_css()

@@ -162,10 +162,40 @@ def extract_numeric_display_value(value: str) -> tuple[float | None, str, str]:
 
 
 def load_custom_css() -> None:
-    """Load project CSS without failing when the file is absent."""
+    """Load project CSS and inject theme-switching JavaScript."""
     css_path = ASSETS_DIR / "styles.css"
     if css_path.exists():
         st.markdown(f"<style>{get_custom_css_text(str(css_path))}</style>", unsafe_allow_html=True)
+    st.markdown(
+        """
+        <script>
+        (function () {
+            var t = localStorage.getItem('sd-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', t);
+
+            window.toggleTheme = function () {
+                var c = document.documentElement.getAttribute('data-theme') || 'dark';
+                var n = c === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', n);
+                localStorage.setItem('sd-theme', n);
+                var icon = document.querySelector('.theme-icon');
+                var lbl  = document.querySelector('.theme-toggle-label');
+                if (icon) icon.textContent = n === 'dark' ? '☀' : '☾';
+                if (lbl)  lbl.textContent  = n === 'dark' ? 'Light mode' : 'Dark mode';
+            };
+
+            setTimeout(function () {
+                var theme = document.documentElement.getAttribute('data-theme') || 'dark';
+                var icon  = document.querySelector('.theme-icon');
+                var lbl   = document.querySelector('.theme-toggle-label');
+                if (icon) icon.textContent = theme === 'dark' ? '☾' : '☀';
+                if (lbl)  lbl.textContent  = theme === 'dark' ? 'Light mode' : 'Dark mode';
+            }, 250);
+        })();
+        </script>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 @st.cache_data(show_spinner=False)
@@ -209,29 +239,15 @@ def get_uploaded_score_distribution_bars(limit: int = 5) -> str:
 
 def render_page_header(title: str, subtitle: str, label: str = "Academic Analytics") -> None:
     """Render a consistent header for dashboard sections."""
-    console_bars = get_uploaded_score_distribution_bars()
     st.markdown(
         f"""
         <div class="page-header">
-            <div class="page-header-content">
-                <div class="page-kicker">{label}</div>
-                <h1>{title}</h1>
-                <p>{subtitle}</p>
+            <div class="page-kicker">
+                <span class="kicker-dot"></span>
+                {escape(label)}
             </div>
-            <div class="hero-console" aria-hidden="true">
-                <div class="console-topline">
-                    <span class="status-dot"></span>
-                    <span>AI ACADEMIC CORE</span>
-                </div>
-                <div class="console-grid">
-                    <span></span><span></span><span></span>
-                    <span></span><span></span><span></span>
-                    <span></span><span></span><span></span>
-                </div>
-                <div class="console-bars">
-                    {console_bars}
-                </div>
-            </div>
+            <h1 class="page-title">{escape(title)}</h1>
+            <p class="page-subtitle">{escape(subtitle)}</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -250,7 +266,6 @@ def render_metric_card(title: str, value: str, note: str, icon: str = "") -> Non
             </div>
             <strong>{value}</strong>
             <small>{note}</small>
-            <div class="metric-status"><span class="status-dot"></span>Live module</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -360,6 +375,10 @@ def render_sidebar() -> str:
             <p>16 modules: warehouse, ETL, quality, KPIs, XAI, forecasting, reports, and audit active.</p>
             <div class="sidebar-data-pill">{lucide_icon("database", "sidebar-pill-icon")} SQLite connected</div>
         </div>
+        <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle colour theme">
+            <span class="theme-icon">☾</span>
+            <span class="theme-toggle-label">Light mode</span>
+        </button>
         """,
         unsafe_allow_html=True,
     )
