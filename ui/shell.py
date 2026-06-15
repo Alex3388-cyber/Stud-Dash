@@ -162,45 +162,30 @@ def extract_numeric_display_value(value: str) -> tuple[float | None, str, str]:
 
 
 def load_custom_css() -> None:
-    """Load project CSS and inject theme-switching JavaScript."""
+    """Load project CSS, busting the cache when the file changes."""
     css_path = ASSETS_DIR / "styles.css"
     if css_path.exists():
-        st.markdown(f"<style>{get_custom_css_text(str(css_path))}</style>", unsafe_allow_html=True)
+        mtime = int(css_path.stat().st_mtime)
+        st.markdown(f"<style>{get_custom_css_text(str(css_path), mtime)}</style>", unsafe_allow_html=True)
+    # Extra high-specificity patch for Streamlit sidebar link underlines
     st.markdown(
         """
-        <script>
-        (function () {
-            var t = localStorage.getItem('sd-theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', t);
-
-            window.toggleTheme = function () {
-                var c = document.documentElement.getAttribute('data-theme') || 'dark';
-                var n = c === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', n);
-                localStorage.setItem('sd-theme', n);
-                var icon = document.querySelector('.theme-icon');
-                var lbl  = document.querySelector('.theme-toggle-label');
-                if (icon) icon.textContent = n === 'dark' ? '☀' : '☾';
-                if (lbl)  lbl.textContent  = n === 'dark' ? 'Light mode' : 'Dark mode';
-            };
-
-            setTimeout(function () {
-                var theme = document.documentElement.getAttribute('data-theme') || 'dark';
-                var icon  = document.querySelector('.theme-icon');
-                var lbl   = document.querySelector('.theme-toggle-label');
-                if (icon) icon.textContent = theme === 'dark' ? '☾' : '☀';
-                if (lbl)  lbl.textContent  = theme === 'dark' ? 'Light mode' : 'Dark mode';
-            }, 250);
-        })();
-        </script>
+        <style>
+        section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] a,
+        section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] a:hover,
+        section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] a:visited {
+            text-decoration: none !important;
+            color: inherit !important;
+        }
+        </style>
         """,
         unsafe_allow_html=True,
     )
 
 
 @st.cache_data(show_spinner=False)
-def get_custom_css_text(css_path: str) -> str:
-    """Cache CSS text so the stylesheet is not re-read on every rerun."""
+def get_custom_css_text(css_path: str, _mtime: int = 0) -> str:
+    """Cache CSS text; _mtime key forces re-read when the file is updated."""
     return Path(css_path).read_text(encoding="utf-8")
 
 
@@ -334,7 +319,6 @@ def render_sidebar() -> str:
                 f'<a class="sidebar-nav-item{active_class}" href="{page_url}" target="_self">'
                 f'<span class="sidebar-nav-icon">{lucide_icon(NAV_ICONS[page])}</span>'
                 f'<span class="sidebar-nav-label">{escape(NAV_LABELS[page])}</span>'
-                f'<span class="sidebar-nav-arrow">{lucide_icon("chevron-right", "sidebar-arrow-icon")}</span>'
                 "</a>"
             )
         markup.append("</nav>")
@@ -375,10 +359,6 @@ def render_sidebar() -> str:
             <p>16 modules: warehouse, ETL, quality, KPIs, XAI, forecasting, reports, and audit active.</p>
             <div class="sidebar-data-pill">{lucide_icon("database", "sidebar-pill-icon")} SQLite connected</div>
         </div>
-        <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle colour theme">
-            <span class="theme-icon">☾</span>
-            <span class="theme-toggle-label">Light mode</span>
-        </button>
         """,
         unsafe_allow_html=True,
     )

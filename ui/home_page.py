@@ -78,58 +78,55 @@ def render_animated_kpi_component(cards: list[KpiCard]) -> None:
         f"""
         <style>
             :root {{
-                --bg-1:    #18181b;
-                --bg-2:    #27272a;
-                --border:  #27272a;
-                --border-s:#3f3f46;
-                --text:    #fafafa;
-                --muted:   #a1a1aa;
-                --muted-2: #71717a;
-                --teal:    #2dd4bf;
-                --cyan:    #38bdf8;
-                --violet:  #a78bfa;
-                --amber:   #fbbf24;
-                --rose:    #fb7185;
-                --green:   #4ade80;
-                --danger:  #f87171;
-                --radius:  8px;
+                --card-bg:   #ffffff;
+                --card-bdr:  #e5e7eb;
+                --icon-bg:   #eff6ff;
+                --text:      #111827;
+                --muted:     #6b7280;
+                --muted-2:   #9ca3af;
+                --blue:      #3b82f6;
+                --green:     #22c55e;
+                --red:       #ef4444;
+                --amber:     #f59e0b;
+                --purple:    #a855f7;
+                --teal:      #14b8a6;
+                --radius:    10px;
             }}
 
             * {{ box-sizing: border-box; }}
 
             body {{
                 background: transparent;
-                font-family: Inter, "Segoe UI", system-ui, sans-serif;
+                font-family: "Inter", "Segoe UI", system-ui, sans-serif;
                 line-height: 1.55;
                 margin: 0;
                 overflow: hidden;
-                text-rendering: optimizeLegibility;
                 -webkit-font-smoothing: antialiased;
-                -moz-osx-font-smoothing: grayscale;
             }}
 
             .home-kpi-grid {{
                 display: grid;
-                gap: 0.7rem;
+                gap: 0.75rem;
                 grid-template-columns: repeat(4, minmax(0, 1fr));
                 padding: 2px;
             }}
 
             .home-kpi-card {{
-                background: var(--bg-1);
-                border: 1px solid var(--border);
-                border-left: 3px solid var(--teal);
+                background: var(--card-bg);
+                border: 1px solid var(--card-bdr);
+                border-left: 3px solid var(--blue);
                 border-radius: var(--radius);
-                box-shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.25);
+                box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.06);
                 display: flex;
                 flex-direction: column;
-                min-height: 128px;
+                min-height: 130px;
                 overflow: hidden;
-                padding: 0.8rem;
+                padding: 1rem;
                 position: relative;
-                transform: translateY(10px);
-                transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
-                animation: kpi-rise 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                animation: kpi-rise 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                opacity: 0;
+                transform: translateY(8px);
+                transition: box-shadow 150ms ease, transform 150ms ease;
             }}
 
             .home-kpi-card:nth-child(2) {{ animation-delay: 60ms; }}
@@ -139,56 +136,48 @@ def render_animated_kpi_component(cards: list[KpiCard]) -> None:
             .home-kpi-card:nth-child(6) {{ animation-delay: 300ms; }}
             .home-kpi-card:nth-child(7) {{ animation-delay: 360ms; }}
 
-            .home-kpi-card::before {{ display: none !important; }}
-
             .home-kpi-card:hover {{
-                border-color: var(--border-s);
-                box-shadow: 0 4px 16px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.35);
+                box-shadow: 0 4px 12px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.08);
                 transform: translateY(-2px);
             }}
 
             .home-kpi-card.kpi-green  {{ border-left-color: var(--green); }}
             .home-kpi-card.kpi-rose,
-            .home-kpi-card.kpi-danger {{ border-left-color: var(--rose); }}
-            .home-kpi-card.kpi-violet {{ border-left-color: var(--violet); }}
+            .home-kpi-card.kpi-danger {{ border-left-color: var(--red); }}
+            .home-kpi-card.kpi-violet {{ border-left-color: var(--purple); }}
             .home-kpi-card.kpi-amber  {{ border-left-color: var(--amber); }}
-            .home-kpi-card.kpi-cyan   {{ border-left-color: var(--cyan); }}
+            .home-kpi-card.kpi-cyan   {{ border-left-color: var(--teal); }}
             .home-kpi-card.kpi-teal   {{ border-left-color: var(--teal); }}
 
             .kpi-glow-ring,
             .kpi-shine {{ display: none !important; }}
 
-            .kpi-icon,
-            .home-kpi-card small,
-            .home-kpi-card strong,
-            .home-kpi-card em,
-            .kpi-progress-line {{ position: relative; z-index: 1; }}
-
             .kpi-icon {{
                 align-items: center;
-                background: var(--bg-2);
+                background: var(--icon-bg);
                 border-radius: 6px;
-                color: var(--teal);
+                color: var(--blue);
                 display: flex;
                 font-size: 0.72rem;
                 font-weight: 700;
-                height: 32px;
+                height: 30px;
                 justify-content: center;
                 margin-bottom: 0.5rem;
-                width: 32px;
+                width: 30px;
             }}
 
-            .kpi-green .kpi-icon, .kpi-teal .kpi-icon  {{ color: var(--green); }}
-            .kpi-rose .kpi-icon, .kpi-danger .kpi-icon {{ color: var(--rose); }}
-            .kpi-violet .kpi-icon {{ color: var(--violet); }}
-            .kpi-amber .kpi-icon  {{ color: var(--amber); }}
-            .kpi-cyan .kpi-icon   {{ color: var(--cyan); }}
+            .kpi-green .kpi-icon, .kpi-teal .kpi-icon   {{ background: #f0fdf4; color: var(--green); }}
+            .kpi-rose .kpi-icon,  .kpi-danger .kpi-icon {{ background: #fef2f2; color: var(--red); }}
+            .kpi-violet .kpi-icon {{ background: #faf5ff; color: var(--purple); }}
+            .kpi-amber .kpi-icon  {{ background: #fffbeb; color: var(--amber); }}
+            .kpi-cyan .kpi-icon   {{ background: #f0fdfa; color: var(--teal); }}
 
             .home-kpi-card small {{
                 color: var(--muted);
                 display: block;
                 font-size: 0.67rem;
                 font-weight: 600;
+                letter-spacing: .04em;
                 line-height: 1.25;
                 min-height: 1.45rem;
                 text-transform: uppercase;
@@ -197,7 +186,7 @@ def render_animated_kpi_component(cards: list[KpiCard]) -> None:
             .home-kpi-card strong {{
                 color: var(--text);
                 display: block;
-                font-size: 1.3rem;
+                font-size: 1.35rem;
                 font-weight: 700;
                 line-height: 1.12;
                 margin: 0.15rem 0 0.18rem;
@@ -214,7 +203,7 @@ def render_animated_kpi_component(cards: list[KpiCard]) -> None:
             }}
 
             .kpi-progress-line {{
-                background: var(--bg-2);
+                background: #f3f4f6;
                 border-radius: 999px;
                 height: 3px;
                 margin-top: auto;
@@ -223,7 +212,7 @@ def render_animated_kpi_component(cards: list[KpiCard]) -> None:
 
             .kpi-progress-line span {{
                 animation: kpi-progress 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-                background: var(--teal);
+                background: var(--blue);
                 border-radius: inherit;
                 display: block;
                 height: 100%;
@@ -232,13 +221,13 @@ def render_animated_kpi_component(cards: list[KpiCard]) -> None:
             }}
 
             .kpi-green .kpi-progress-line span, .kpi-teal .kpi-progress-line span  {{ background: var(--green); }}
-            .kpi-rose .kpi-progress-line span, .kpi-danger .kpi-progress-line span {{ background: var(--rose); }}
-            .kpi-violet .kpi-progress-line span {{ background: var(--violet); }}
+            .kpi-rose .kpi-progress-line span, .kpi-danger .kpi-progress-line span {{ background: var(--red); }}
+            .kpi-violet .kpi-progress-line span {{ background: var(--purple); }}
             .kpi-amber .kpi-progress-line span  {{ background: var(--amber); }}
-            .kpi-cyan .kpi-progress-line span   {{ background: var(--cyan); }}
+            .kpi-cyan .kpi-progress-line span   {{ background: var(--teal); }}
 
             @keyframes kpi-rise {{
-                from {{ opacity: 0; transform: translateY(10px); }}
+                from {{ opacity: 0; transform: translateY(8px); }}
                 to   {{ opacity: 1; transform: translateY(0); }}
             }}
 

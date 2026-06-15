@@ -197,7 +197,7 @@ def render_etl_monitor() -> None:
             stage_counts.columns = ["Stage", "Count"]
             fig = px.pie(stage_counts, names="Stage", values="Count",
                         color_discrete_sequence=px.colors.qualitative.Set2)
-            fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+            fig.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)",
                              plot_bgcolor="rgba(0,0,0,0)", showlegend=True)
             st.plotly_chart(fig, use_container_width=True)
 
@@ -210,7 +210,7 @@ def render_etl_monitor() -> None:
                               name="Rows In", marker_color="#65c7ff"))
         fig2.add_trace(go.Bar(x=jobs_sorted["started_at"], y=jobs_sorted["rows_out"],
                               name="Rows Out", marker_color="#36e6c2"))
-        fig2.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+        fig2.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)",
                           plot_bgcolor="rgba(0,0,0,0)", barmode="group",
                           xaxis_title="Run Time", yaxis_title="Record Count")
         st.plotly_chart(fig2, use_container_width=True)
@@ -326,7 +326,7 @@ def render_data_quality() -> None:
             completeness_df, x="Non-Null %", y="Column", orientation="h",
             color="Non-Null %", color_continuous_scale="RdYlGn", range_color=[0, 100],
         )
-        fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+        fig.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)",
                          plot_bgcolor="rgba(0,0,0,0)", showlegend=False,
                          height=max(300, len(data.columns) * 24))
         st.plotly_chart(fig, use_container_width=True)
@@ -426,7 +426,7 @@ def render_kpi_dashboard() -> None:
             )
             fig.add_vline(x=60, line_dash="dash", line_color="#ff6b91", annotation_text="Pass Threshold (60%)")
             fig.add_vline(x=80, line_dash="dash", line_color="#ffd166", annotation_text="High Performer (80%)")
-            fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+            fig.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)",
                              plot_bgcolor="rgba(0,0,0,0)", showlegend=False,
                              xaxis_title="Score", yaxis_title="Students")
             st.plotly_chart(fig, use_container_width=True)
@@ -440,7 +440,7 @@ def render_kpi_dashboard() -> None:
                 names=["Pass", "Fail"],
                 color_discrete_sequence=["#36e6c2", "#ff6b91"],
             )
-            fig2.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)")
+            fig2.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)")
             st.plotly_chart(fig2, use_container_width=True)
 
     # ── Departmental breakdown ───────────────────────────────────────────────
@@ -461,7 +461,7 @@ def render_kpi_dashboard() -> None:
                      color="Avg Score", color_continuous_scale="RdYlGn",
                      range_color=[0, 100], text="Students",
                      labels={"Avg Score": "Average Score (%)"})
-        fig3.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+        fig3.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)",
                           plot_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig3, use_container_width=True)
     else:
@@ -547,7 +547,7 @@ def render_explainability() -> None:
                 title="Feature Contributions (positive = pushes toward Pass)",
                 labels={"shap_value": "Contribution Score", "feature": "Feature"},
             )
-            fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+            fig.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)",
                              plot_bgcolor="rgba(0,0,0,0)")
             st.plotly_chart(fig, use_container_width=True)
 
@@ -605,7 +605,7 @@ def render_advanced_charts() -> None:
             color_continuous_scale="RdBu_r", zmin=-1, zmax=1,
             title="Pearson Correlation Between All Numeric Features",
         )
-        fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)")
+        fig.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig, use_container_width=True)
 
     with tab2:
@@ -620,14 +620,14 @@ def render_advanced_charts() -> None:
             metric = st.selectbox("Score metric", score_cols, key="violin_metric")
             fig2 = px.violin(data, x=grp, y=metric, box=True, points="outliers",
                             color=grp, title=f"{metric} Distribution by {grp}")
-            fig2.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+            fig2.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)",
                                plot_bgcolor="rgba(0,0,0,0)")
             st.plotly_chart(fig2, use_container_width=True)
         else:
             # Simple violin across all score cols
             melted = data[score_cols].melt(var_name="Feature", value_name="Value")
             fig2 = px.violin(melted, x="Feature", y="Value", box=True, color="Feature")
-            fig2.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+            fig2.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)",
                                plot_bgcolor="rgba(0,0,0,0)")
             st.plotly_chart(fig2, use_container_width=True)
 
@@ -639,7 +639,7 @@ def render_advanced_charts() -> None:
                 fig3 = px.histogram(data, x=col_name, nbins=25,
                                    color_discrete_sequence=["#65c7ff"],
                                    title=f"Distribution of {col_name}")
-                fig3.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+                fig3.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)",
                                   plot_bgcolor="rgba(0,0,0,0)")
                 st.plotly_chart(fig3, use_container_width=True)
 
@@ -658,7 +658,7 @@ def render_advanced_charts() -> None:
                 title=f"{y_col} vs {x_col}",
                 opacity=0.65,
             )
-            fig4.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+            fig4.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)",
                                plot_bgcolor="rgba(0,0,0,0)")
             st.plotly_chart(fig4, use_container_width=True)
 
@@ -884,7 +884,7 @@ def render_forecasting() -> None:
                 title=f"{title_label} Forecast — {horizon}-Day Horizon ({fc_output.method})",
                 xaxis_title="Days Ahead",
                 yaxis_title=f"{title_label} (%)",
-                template="plotly_dark",
+                template="plotly_white",
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor="rgba(0,0,0,0)",
                 hovermode="x unified",
@@ -1154,7 +1154,7 @@ def render_audit_log() -> None:
                 breakdown.columns = ["Event Type", "Count"]
                 fig = px.bar(breakdown, x="Event Type", y="Count", color="Count",
                             color_continuous_scale="Blues", title="Events by Type")
-                fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+                fig.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)",
                                  plot_bgcolor="rgba(0,0,0,0)")
                 st.plotly_chart(fig, use_container_width=True)
 
@@ -1190,6 +1190,6 @@ def render_audit_log() -> None:
                 fig = px.histogram(predictions, x="risk_level" if "risk_level" in predictions.columns else "predicted_label",
                                   title="Risk Level Distribution",
                                   color_discrete_sequence=["#36e6c2"])
-                fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+                fig.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)",
                                  plot_bgcolor="rgba(0,0,0,0)")
                 st.plotly_chart(fig, use_container_width=True)

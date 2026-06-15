@@ -442,7 +442,7 @@ def render_etl_monitor() -> None:
                     values=list(stage_counts.values()),
                     color_discrete_sequence=px.colors.qualitative.Set2,
                 )
-                fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)")
+                fig.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)")
                 st.plotly_chart(fig, use_container_width=True)
 
         st.subheader("Records Processed Over Time")
@@ -452,7 +452,7 @@ def render_etl_monitor() -> None:
         fig2.add_trace(go.Bar(x=times, y=[j.rows_extracted for j in sorted_jobs], name="Rows Extracted", marker_color="#38bdf8"))
         fig2.add_trace(go.Bar(x=times, y=[j.rows_loaded for j in sorted_jobs], name="Rows Loaded", marker_color="#2dd4bf"))
         fig2.update_layout(
-            template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            template="plotly_white", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
             barmode="group", xaxis_title="Run Time", yaxis_title="Record Count",
         )
         st.plotly_chart(fig2, use_container_width=True)
