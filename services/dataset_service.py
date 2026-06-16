@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import hashlib
+import os
 from collections.abc import Callable
 
+import joblib
 import pandas as pd
 import streamlit as st
 
@@ -30,6 +33,31 @@ from utilities.dataset_manager import (
     set_preprocessing_artifacts,
 )
 from utilities.schema_mapping import normalize_lookup
+
+_PIPELINE_CACHE_DIR = os.path.join("database", "pipeline_cache")
+
+
+def _sig_cache_key(signature: object) -> str:
+    return hashlib.md5(str(signature).encode()).hexdigest()
+
+
+def _load_pipeline_disk_cache(signature: object) -> dict | None:
+    path = os.path.join(_PIPELINE_CACHE_DIR, f"{_sig_cache_key(signature)}.pkl")
+    if os.path.exists(path):
+        try:
+            return joblib.load(path)
+        except Exception:
+            return None
+    return None
+
+
+def _save_pipeline_disk_cache(signature: object, cache: dict) -> None:
+    os.makedirs(_PIPELINE_CACHE_DIR, exist_ok=True)
+    path = os.path.join(_PIPELINE_CACHE_DIR, f"{_sig_cache_key(signature)}.pkl")
+    try:
+        joblib.dump(cache, path)
+    except Exception:
+        pass
 
 
 def get_active_kpi_dataset() -> tuple[pd.DataFrame, str, str]:
@@ -219,11 +247,37 @@ def run_automatic_dataset_pipeline(
     data: pd.DataFrame,
     dataset_name: str,
     on_progress: Callable[[float, str], None] | None = None,
+    signature: object = None,
 ) -> dict[str, object]:
-    """Preprocess the active dataset and retrain automatic analytics models."""
+    """Preprocess the active dataset and retrain automatic analytics models.
+
+    Checks a joblib disk cache keyed by dataset signature before training.
+    On a cache hit, models and preprocessed data are restored instantly.
+    """
     def _step(pct: float, msg: str) -> None:
         if on_progress is not None:
             on_progress(pct, msg)
+
+    # Fast path: restore from disk cache if available
+    if signature is not None:
+        _step(0.05, "Checking cached analytics results…")
+        cached = _load_pipeline_disk_cache(signature)
+        if cached is not None:
+            _step(0.40, "Cache hit — restoring analytics results…")
+            try:
+                set_preprocessing_artifacts(
+                    cached["cleaned_dataset"],
+                    cached["feature_matrix"],
+                    cached["preprocessing_summary"],
+                )
+                if cached.get("classification_run") is not None:
+                    set_classification_run(cached["classification_run"])
+                if cached.get("clustering_run") is not None:
+                    set_clustering_run(cached["clustering_run"])
+                _step(1.00, "Analytics ready")
+                return cached["report"]
+            except Exception:
+                pass  # Cache is corrupt — fall through and retrain
 
     report: dict[str, object] = {
         "dataset_name": dataset_name,
@@ -232,6 +286,7 @@ def run_automatic_dataset_pipeline(
         "clustering": "pending",
     }
 
+    cleaned_dataset = data
     _step(0.05, "Reading dataset schema…")
     try:
         _step(0.10, "Step 1 of 3 — Preprocessing & cleaning dataset…")
@@ -241,10 +296,12 @@ def run_automatic_dataset_pipeline(
         _step(0.34, "Step 1 of 3 — Preprocessing complete")
     except Exception as error:
         report["preprocessing"] = f"skipped: {error}"
-        cleaned_dataset = data
+        feature_matrix = pd.DataFrame()
+        preprocessing_summary = {}
 
     modeling_data = cleaned_dataset if isinstance(cleaned_dataset, pd.DataFrame) and not cleaned_dataset.empty else data
 
+    classification_run = None
     try:
         _step(0.40, "Step 2 of 3 — Training classification models…")
         target_column, score_columns, feature_columns, pass_threshold = choose_auto_classification_setup(modeling_data)
@@ -256,6 +313,7 @@ def run_automatic_dataset_pipeline(
             pass_threshold=pass_threshold,
             test_size=0.3,
             random_state=42,
+            cv_folds=3,
         )
         set_classification_run(classification_run)
         report["classification"] = "completed"
@@ -265,6 +323,7 @@ def run_automatic_dataset_pipeline(
         report["classification"] = f"skipped: {error}"
         _step(0.67, "Step 2 of 3 — Classification skipped")
 
+    clustering_run = None
     try:
         _step(0.72, "Step 3 of 3 — Running K-Means student clustering…")
         clustering_features, performance_columns = choose_auto_clustering_setup(modeling_data)
@@ -281,6 +340,17 @@ def run_automatic_dataset_pipeline(
         clear_clustering_run()
         report["clustering"] = f"skipped: {error}"
         _step(1.00, "Pipeline complete")
+
+    # Persist to disk so subsequent sessions skip retraining
+    if signature is not None:
+        _save_pipeline_disk_cache(signature, {
+            "cleaned_dataset": cleaned_dataset,
+            "feature_matrix": feature_matrix,
+            "preprocessing_summary": preprocessing_summary,
+            "classification_run": classification_run,
+            "clustering_run": clustering_run,
+            "report": report,
+        })
 
     return report
 
@@ -302,11 +372,11 @@ def ensure_active_dataset_pipeline(show_spinner: bool = False) -> tuple[bool, di
         def _on_progress(pct: float, msg: str) -> None:
             progress_bar.progress(min(pct, 1.0), text=msg)
 
-        report = run_automatic_dataset_pipeline(data, dataset_name, on_progress=_on_progress)
+        report = run_automatic_dataset_pipeline(data, dataset_name, on_progress=_on_progress, signature=active_signature)
         set_auto_pipeline_report(active_signature, report)
         progress_bar.empty()
     else:
-        report = run_automatic_dataset_pipeline(data, dataset_name)
+        report = run_automatic_dataset_pipeline(data, dataset_name, signature=active_signature)
         set_auto_pipeline_report(active_signature, report)
 
     return True, report

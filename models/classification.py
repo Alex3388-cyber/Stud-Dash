@@ -481,7 +481,7 @@ def build_feature_importance_table(
         features,
         target,
         scoring=make_scorer(f1_score, pos_label=PASS_LABEL, zero_division=0),
-        n_repeats=8,
+        n_repeats=5,
         random_state=random_state,
         n_jobs=1,
     )
@@ -720,7 +720,7 @@ def train_classification_models(
         (
             "Random Forest Classifier",
             RandomForestClassifier(
-                n_estimators=250,
+                n_estimators=100,
                 random_state=random_state,
                 min_samples_leaf=2,
                 n_jobs=-1,

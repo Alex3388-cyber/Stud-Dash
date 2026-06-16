@@ -66,28 +66,28 @@ def render_data_warehouse() -> None:
     st.markdown(
         """
         <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:16px 0 24px">
-          <div style="flex:1;min-width:140px;background:rgba(15,52,96,.6);border:1px solid #1e4d7e;border-radius:8px;padding:16px;text-align:center">
-            <div style="color:#65c7ff;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Raw Layer</div>
+          <div style="flex:1;min-width:140px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px;text-align:center">
+            <div style="color:#2563eb;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Raw Layer</div>
             <div style="font-size:28px;font-weight:800;margin:6px 0">📥</div>
-            <div style="font-size:12px;color:#a8bad0">Original uploads as-is</div>
+            <div style="font-size:12px;color:#6b7280">Original uploads as-is</div>
           </div>
-          <div style="color:#36e6c2;font-size:24px">→</div>
-          <div style="flex:1;min-width:140px;background:rgba(15,52,96,.6);border:1px solid #1e4d7e;border-radius:8px;padding:16px;text-align:center">
-            <div style="color:#36e6c2;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Cleaned Layer</div>
+          <div style="color:#3b82f6;font-size:24px">→</div>
+          <div style="flex:1;min-width:140px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px;text-align:center">
+            <div style="color:#16a34a;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Cleaned Layer</div>
             <div style="font-size:28px;font-weight:800;margin:6px 0">🧹</div>
-            <div style="font-size:12px;color:#a8bad0">Dedup, null fill, type coercion</div>
+            <div style="font-size:12px;color:#6b7280">Dedup, null fill, type coercion</div>
           </div>
-          <div style="color:#36e6c2;font-size:24px">→</div>
-          <div style="flex:1;min-width:140px;background:rgba(15,52,96,.6);border:1px solid #1e4d7e;border-radius:8px;padding:16px;text-align:center">
-            <div style="color:#9b7cff;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Transformed Layer</div>
+          <div style="color:#3b82f6;font-size:24px">→</div>
+          <div style="flex:1;min-width:140px;background:#faf5ff;border:1px solid #e9d5ff;border-radius:8px;padding:16px;text-align:center">
+            <div style="color:#7c3aed;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Transformed Layer</div>
             <div style="font-size:28px;font-weight:800;margin:6px 0">⚙️</div>
-            <div style="font-size:12px;color:#a8bad0">Scaled, encoded, feature matrix</div>
+            <div style="font-size:12px;color:#6b7280">Scaled, encoded, feature matrix</div>
           </div>
-          <div style="color:#36e6c2;font-size:24px">→</div>
-          <div style="flex:1;min-width:140px;background:rgba(15,52,96,.6);border:1px solid #1e4d7e;border-radius:8px;padding:16px;text-align:center">
-            <div style="color:#ffd166;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Warehouse Layer</div>
+          <div style="color:#3b82f6;font-size:24px">→</div>
+          <div style="flex:1;min-width:140px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:16px;text-align:center">
+            <div style="color:#d97706;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Warehouse Layer</div>
             <div style="font-size:28px;font-weight:800;margin:6px 0">🏛️</div>
-            <div style="font-size:12px;color:#a8bad0">KPIs, models, audit tables</div>
+            <div style="font-size:12px;color:#6b7280">KPIs, models, audit tables</div>
           </div>
         </div>
         """,
@@ -219,9 +219,9 @@ def render_etl_monitor() -> None:
 def _render_pipeline_status_key() -> None:
     st.markdown(
         """
-        <div style="background:rgba(15,52,96,.4);border:1px solid #1e4d7e;border-radius:8px;padding:16px;margin-top:16px">
-          <strong>Pipeline Stages Tracked</strong>
-          <ul style="margin:8px 0 0;color:#a8bad0;font-size:13px">
+        <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin-top:16px">
+          <strong style="color:#1f2937">Pipeline Stages Tracked</strong>
+          <ul style="margin:8px 0 0;color:#6b7280;font-size:13px">
             <li><b>Extract</b> — Read raw file bytes and parse CSV/Excel</li>
             <li><b>Validate</b> — Schema check, type detection, quality scoring</li>
             <li><b>Transform</b> — Dedup, null fill, scaling, encoding</li>
@@ -288,25 +288,25 @@ def render_data_quality() -> None:
     st.markdown(
         f"""
         <div style="display:flex;gap:16px;align-items:stretch;flex-wrap:wrap;margin-bottom:24px">
-          <div style="flex:1;min-width:120px;background:rgba(15,52,96,.6);border:1px solid {grade_color};border-radius:8px;padding:20px;text-align:center">
+          <div style="flex:1;min-width:120px;background:#fff;border:2px solid {grade_color};border-radius:8px;padding:20px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)">
             <div style="color:{grade_color};font-size:11px;font-weight:700;letter-spacing:1px">QUALITY GRADE</div>
             <div style="font-size:52px;font-weight:900;color:{grade_color}">{grade}</div>
-            <div style="font-size:13px;color:#a8bad0">{overall*100:.1f} / 100</div>
+            <div style="font-size:13px;color:#6b7280">{overall*100:.1f} / 100</div>
           </div>
-          <div style="flex:1;min-width:120px;background:rgba(15,52,96,.6);border:1px solid #1e4d7e;border-radius:8px;padding:20px;text-align:center">
-            <div style="color:#65c7ff;font-size:11px;font-weight:700;letter-spacing:1px">COMPLETENESS</div>
-            <div style="font-size:36px;font-weight:800;color:#65c7ff">{completeness*100:.1f}%</div>
-            <div style="font-size:12px;color:#a8bad0">{missing_cells:,} missing cells</div>
+          <div style="flex:1;min-width:120px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:20px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+            <div style="color:#3b82f6;font-size:11px;font-weight:700;letter-spacing:1px">COMPLETENESS</div>
+            <div style="font-size:36px;font-weight:800;color:#3b82f6">{completeness*100:.1f}%</div>
+            <div style="font-size:12px;color:#6b7280">{missing_cells:,} missing cells</div>
           </div>
-          <div style="flex:1;min-width:120px;background:rgba(15,52,96,.6);border:1px solid #1e4d7e;border-radius:8px;padding:20px;text-align:center">
-            <div style="color:#ffd166;font-size:11px;font-weight:700;letter-spacing:1px">DUPLICATE ROWS</div>
-            <div style="font-size:36px;font-weight:800;color:#ffd166">{dup_rows}</div>
-            <div style="font-size:12px;color:#a8bad0">{dup_rate*100:.1f}% of total rows</div>
+          <div style="flex:1;min-width:120px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:20px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+            <div style="color:#f59e0b;font-size:11px;font-weight:700;letter-spacing:1px">DUPLICATE ROWS</div>
+            <div style="font-size:36px;font-weight:800;color:#f59e0b">{dup_rows}</div>
+            <div style="font-size:12px;color:#6b7280">{dup_rate*100:.1f}% of total rows</div>
           </div>
-          <div style="flex:1;min-width:120px;background:rgba(15,52,96,.6);border:1px solid #1e4d7e;border-radius:8px;padding:20px;text-align:center">
-            <div style="color:#ff6b91;font-size:11px;font-weight:700;letter-spacing:1px">OUTLIER COLUMNS</div>
-            <div style="font-size:36px;font-weight:800;color:#ff6b91">{len(outlier_cols)}</div>
-            <div style="font-size:12px;color:#a8bad0">z-score &gt; 3 detected</div>
+          <div style="flex:1;min-width:120px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:20px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+            <div style="color:#ef4444;font-size:11px;font-weight:700;letter-spacing:1px">OUTLIER COLUMNS</div>
+            <div style="font-size:36px;font-weight:800;color:#ef4444">{len(outlier_cols)}</div>
+            <div style="font-size:12px;color:#6b7280">z-score &gt; 3 detected</div>
           </div>
         </div>
         """,
@@ -771,9 +771,9 @@ def render_decision_support() -> None:
         st.subheader(f"📋 Observations ({len(observations)})")
         for obs in observations:
             st.markdown(
-                f"""<div style="background:rgba(15,52,96,.5);border-left:4px solid #36e6c2;border-radius:4px;padding:12px;margin-bottom:10px">
+                f"""<div style="background:#f0fdf4;border-left:4px solid #16a34a;border-radius:4px;padding:12px;margin-bottom:10px">
                 <strong>{obs['icon']} {escape(obs['title'])}</strong><br>
-                <span style="color:#a8bad0;font-size:13px">{escape(obs['text'])}</span></div>""",
+                <span style="color:#6b7280;font-size:13px">{escape(obs['text'])}</span></div>""",
                 unsafe_allow_html=True,
             )
 
@@ -782,9 +782,9 @@ def render_decision_support() -> None:
         for warn in warnings:
             color = "#ff6b91" if warn["icon"] == "🚨" else "#ffd166"
             st.markdown(
-                f"""<div style="background:rgba(15,52,96,.5);border-left:4px solid {color};border-radius:4px;padding:12px;margin-bottom:10px">
+                f"""<div style="background:#fff;border-left:4px solid {color};border-radius:4px;padding:12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
                 <strong>{warn['icon']} {escape(warn['title'])}</strong><br>
-                <span style="color:#a8bad0;font-size:13px">{escape(warn['text'])}</span></div>""",
+                <span style="color:#6b7280;font-size:13px">{escape(warn['text'])}</span></div>""",
                 unsafe_allow_html=True,
             )
         if not warnings:
@@ -796,10 +796,10 @@ def render_decision_support() -> None:
         for rec in sorted(recommendations, key=lambda r: {"HIGH": 0, "MEDIUM": 1, "LOW": 2}.get(r["priority"], 3)):
             color = priority_colors.get(rec["priority"], "#65c7ff")
             st.markdown(
-                f"""<div style="background:rgba(15,52,96,.5);border-left:4px solid {color};border-radius:4px;padding:12px;margin-bottom:10px">
+                f"""<div style="background:#fff;border-left:4px solid {color};border-radius:4px;padding:12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
                 <span style="color:{color};font-size:10px;font-weight:700">{rec['priority']} PRIORITY</span><br>
                 <strong>{escape(rec['action'])}</strong><br>
-                <span style="color:#a8bad0;font-size:12px">{escape(rec['rationale'])}</span></div>""",
+                <span style="color:#6b7280;font-size:12px">{escape(rec['rationale'])}</span></div>""",
                 unsafe_allow_html=True,
             )
 
