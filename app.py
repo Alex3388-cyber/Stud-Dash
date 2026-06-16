@@ -5,7 +5,7 @@ from __future__ import annotations
 import streamlit as st
 from streamlit.runtime.scriptrunner import RerunException, StopException
 
-from services.database_service import initialize_storage, get_latest_dataset
+from services.database_service import initialize_storage, get_latest_dataset, record_audit_event
 from services.dataset_service import ensure_active_dataset_pipeline
 from ui.pages import PAGE_RENDERERS
 from ui.shell import load_custom_css, render_sidebar
@@ -41,6 +41,10 @@ def _restore_dataset_from_sqlite() -> bool:
     set_raw_dataset(data, dataset_name=dataset_name, source="sqlite", signature=sig)
     detected_mapping = merge_schema_mapping(data, None)
     set_schema_mapping(detected_mapping, sig)
+    try:
+        record_audit_event("dataset_restore", entity_name=dataset_name, detail=f"{len(data):,} rows restored from SQLite", rows_affected=len(data))
+    except Exception:
+        pass
     return True
 
 

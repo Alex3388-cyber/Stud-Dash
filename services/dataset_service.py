@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import time
 from collections.abc import Callable
 
 import joblib
@@ -32,6 +33,7 @@ from utilities.dataset_manager import (
     set_clustering_run,
     set_preprocessing_artifacts,
 )
+from services.database_service import record_audit_event, record_etl_job
 from utilities.schema_mapping import normalize_lookup
 
 _PIPELINE_CACHE_DIR = os.path.join("database", "pipeline_cache")
@@ -288,12 +290,18 @@ def run_automatic_dataset_pipeline(
 
     cleaned_dataset = data
     _step(0.05, "Reading dataset schema…")
+    _t0 = time.monotonic()
     try:
         _step(0.10, "Step 1 of 3 — Preprocessing & cleaning dataset…")
         cleaned_dataset, feature_matrix, preprocessing_summary, _transformer = preprocess_dataset(data)
         set_preprocessing_artifacts(cleaned_dataset, feature_matrix, preprocessing_summary)
         report["preprocessing"] = "completed"
         _step(0.34, "Step 1 of 3 — Preprocessing complete")
+        try:
+            _dur = int((time.monotonic() - _t0) * 1000)
+            record_etl_job(dataset_name, "transform", rows_in=len(data), rows_out=len(cleaned_dataset), duration_ms=_dur)
+        except Exception:
+            pass
     except Exception as error:
         report["preprocessing"] = f"skipped: {error}"
         feature_matrix = pd.DataFrame()
@@ -340,6 +348,19 @@ def run_automatic_dataset_pipeline(
         clear_clustering_run()
         report["clustering"] = f"skipped: {error}"
         _step(1.00, "Pipeline complete")
+
+    try:
+        _total_ms = int((time.monotonic() - _t0) * 1000)
+        _out_rows = len(modeling_data) if isinstance(modeling_data, pd.DataFrame) else len(data)
+        record_etl_job(dataset_name, "load", rows_in=_out_rows, rows_out=_out_rows, duration_ms=_total_ms)
+        record_audit_event(
+            "pipeline_run",
+            entity_name=dataset_name,
+            detail=f"preprocessing={report['preprocessing']}, classification={report['classification']}, clustering={report['clustering']}",
+            rows_affected=len(data),
+        )
+    except Exception:
+        pass
 
     # Persist to disk so subsequent sessions skip retraining
     if signature is not None:

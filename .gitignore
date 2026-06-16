@@ -16,6 +16,8 @@ models/artifacts/*
 database/*.db
 database/*.sqlite
 database/*.sqlite3
+database/pipeline_cache/
+screenshots/
 
 # Keep placeholder/documentation files
 !datasets/raw/.gitkeep

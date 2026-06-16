@@ -16,7 +16,7 @@ from pandas.errors import EmptyDataError, ParserError
 import streamlit as st
 
 from preprocessing.dataset_inspection import DatasetProfile, build_dataset_profile
-from services.database_service import save_dataset_upload
+from services.database_service import save_dataset_upload, record_audit_event, record_etl_job
 from utilities.dataset_manager import (
     clear_analytics_state,
     clear_derived_state,
@@ -465,6 +465,12 @@ def process_uploaded_dataset_file(
             st.session_state["last_saved_upload_signature"] = upload_signature
             st.session_state["last_saved_dataset_id"] = dataset_id
             result["saved_dataset_id"] = dataset_id
+            try:
+                record_etl_job(uploaded_file.name, "extract", rows_in=0, rows_out=len(data))
+                record_etl_job(uploaded_file.name, "validate", rows_in=len(data), rows_out=len(data))
+                record_audit_event("dataset_upload", entity_name=uploaded_file.name, detail=f"{len(data):,} rows, {len(data.columns)} columns", rows_affected=len(data))
+            except Exception:
+                pass
         except Exception as error:
             result["save_warning"] = "The dataset was loaded, but it could not be saved to SQLite."
             result["save_error_detail"] = str(error)

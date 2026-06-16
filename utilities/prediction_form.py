@@ -16,7 +16,7 @@ from models.student_prediction import (
     PASS_LABEL,
     StudentPrediction,
 )
-from services.database_service import save_prediction
+from services.database_service import save_prediction, record_audit_event
 from services.prediction_service import infer_feature_mapping, prepare_prediction_model, run_prediction
 from utilities.dataset_manager import get_schema_mapping
 from utilities.trust_ui import (
@@ -530,6 +530,15 @@ def render_student_prediction_form(active_data: pd.DataFrame, dataset_name: str)
         )
         st.session_state["last_prediction_id"] = prediction_id
         st.caption(f"Prediction saved to SQLite with ID `{prediction_id}`.")
+        try:
+            record_audit_event(
+                "prediction",
+                entity_name=dataset_name,
+                detail=f"Logistic Regression → {prediction.predicted_label} ({prediction.confidence_score * 100:.1f}% confidence)",
+                rows_affected=1,
+            )
+        except Exception:
+            pass
     except Exception as error:
         st.warning("Prediction completed, but it could not be saved to SQLite.")
         st.caption(f"Technical detail: {error}")
