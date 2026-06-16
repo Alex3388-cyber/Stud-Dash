@@ -93,3 +93,9 @@ def record_audit_event(event_type: str, entity_name: str | None = None, detail: 
 def get_audit_events(limit: int = 200):
     """Fetch audit log events."""
     return fetch_audit_events(limit)
+
+
+def get_latest_dataset():
+    """Return the most recently saved dataset from SQLite as (DataFrame, name, id)."""
+    from database.operations import fetch_latest_saved_dataset
+    return fetch_latest_saved_dataset()

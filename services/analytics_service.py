@@ -53,7 +53,7 @@ def scale_percent_value(value: float | None, reference_values: pd.Series | pd.Da
 def format_percent(value: float | None) -> str:
     """Format a percentage for display."""
     if value is None or pd.isna(value):
-        return "N/A"
+        return "--%"
     return f"{value:.1f}%"
 
 
@@ -356,7 +356,7 @@ def build_home_kpis() -> dict[str, object]:
         KpiCard("Average Score", format_percent(average_score), f"{len(score_columns)} score field(s)", "AV", "violet"),
         KpiCard(
             attendance_metric_title,
-            "N/A" if average_absences is None and average_attendance is None else f"{average_absences:.1f}" if average_absences is not None else format_percent(average_attendance),
+            "--%"  if average_absences is None and average_attendance is None else f"{average_absences:.1f}" if average_absences is not None else format_percent(average_attendance),
             attendance_metric_note,
             "AT",
             "amber",
@@ -364,7 +364,7 @@ def build_home_kpis() -> dict[str, object]:
         KpiCard("Prediction Accuracy", format_percent(prediction_accuracy), accuracy_source, "AI", "teal"),
         KpiCard(
             "At-Risk Students",
-            "N/A" if at_risk_count is None else f"{at_risk_count:,}",
+            "--" if at_risk_count is None else f"{at_risk_count:,}",
             at_risk_source,
             "RK",
             "danger",
@@ -401,12 +401,12 @@ def build_empty_home_snapshot(data: pd.DataFrame, dataset_name: str, source_labe
     """Return an empty dashboard state until the user uploads a dataset."""
     cards = [
         KpiCard("Total Students", "0", source_label, "ST", "cyan"),
-        KpiCard("Pass Rate", "N/A", "Upload a dataset to calculate", "PS", "green"),
-        KpiCard("Fail Rate", "N/A", "Upload a dataset to calculate", "FL", "rose"),
-        KpiCard("Average Score", "N/A", "Waiting for score columns", "AV", "violet"),
-        KpiCard("Attendance Metric", "N/A", "Waiting for attendance or absence fields", "AT", "amber"),
-        KpiCard("Prediction Accuracy", "N/A", "Upload data to estimate", "AI", "teal"),
-        KpiCard("At-Risk Students", "N/A", "Upload data to calculate", "RK", "danger"),
+        KpiCard("Pass Rate", "--%", "Upload a dataset to calculate", "PS", "green"),
+        KpiCard("Fail Rate", "--%", "Upload a dataset to calculate", "FL", "rose"),
+        KpiCard("Average Score", "--%", "Waiting for score columns", "AV", "violet"),
+        KpiCard("Attendance Metric", "--%", "Waiting for attendance or absence fields", "AT", "amber"),
+        KpiCard("Prediction Accuracy", "--%", "Upload data to estimate", "AI", "teal"),
+        KpiCard("At-Risk Students", "--", "Upload data to calculate", "RK", "danger"),
     ]
     return {
         "data": data,

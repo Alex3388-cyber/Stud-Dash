@@ -140,7 +140,7 @@ LUCIDE_ICON_PATHS = {
 def extract_numeric_display_value(value: str) -> tuple[float | None, str, str]:
     """Extract a numeric value plus prefix and suffix for count-up display."""
     clean_value = value.strip()
-    if clean_value.upper() == "N/A":
+    if clean_value.upper() == "N/A" or clean_value.startswith("--"):
         return None, "", clean_value
 
     prefix = ""

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import pandas as pd
 import streamlit as st
 
@@ -213,8 +215,16 @@ def choose_auto_clustering_setup(data: pd.DataFrame) -> tuple[list[str], list[st
     return feature_columns, performance_columns
 
 
-def run_automatic_dataset_pipeline(data: pd.DataFrame, dataset_name: str) -> dict[str, object]:
+def run_automatic_dataset_pipeline(
+    data: pd.DataFrame,
+    dataset_name: str,
+    on_progress: Callable[[float, str], None] | None = None,
+) -> dict[str, object]:
     """Preprocess the active dataset and retrain automatic analytics models."""
+    def _step(pct: float, msg: str) -> None:
+        if on_progress is not None:
+            on_progress(pct, msg)
+
     report: dict[str, object] = {
         "dataset_name": dataset_name,
         "preprocessing": "pending",
@@ -222,19 +232,21 @@ def run_automatic_dataset_pipeline(data: pd.DataFrame, dataset_name: str) -> dic
         "clustering": "pending",
     }
 
+    _step(0.05, "Reading dataset schema…")
     try:
+        _step(0.10, "Step 1 of 3 — Preprocessing & cleaning dataset…")
         cleaned_dataset, feature_matrix, preprocessing_summary, _transformer = preprocess_dataset(data)
         set_preprocessing_artifacts(cleaned_dataset, feature_matrix, preprocessing_summary)
         report["preprocessing"] = "completed"
+        _step(0.34, "Step 1 of 3 — Preprocessing complete")
     except Exception as error:
         report["preprocessing"] = f"skipped: {error}"
         cleaned_dataset = data
-    else:
-        cleaned_dataset = cleaned_dataset
 
     modeling_data = cleaned_dataset if isinstance(cleaned_dataset, pd.DataFrame) and not cleaned_dataset.empty else data
 
     try:
+        _step(0.40, "Step 2 of 3 — Training classification models…")
         target_column, score_columns, feature_columns, pass_threshold = choose_auto_classification_setup(modeling_data)
         classification_run = train_classification_models(
             data=modeling_data,
@@ -247,11 +259,14 @@ def run_automatic_dataset_pipeline(data: pd.DataFrame, dataset_name: str) -> dic
         )
         set_classification_run(classification_run)
         report["classification"] = "completed"
+        _step(0.67, "Step 2 of 3 — Classification models ready")
     except Exception as error:
         clear_classification_run()
         report["classification"] = f"skipped: {error}"
+        _step(0.67, "Step 2 of 3 — Classification skipped")
 
     try:
+        _step(0.72, "Step 3 of 3 — Running K-Means student clustering…")
         clustering_features, performance_columns = choose_auto_clustering_setup(modeling_data)
         clustering_run = run_kmeans_clustering(
             data=modeling_data,
@@ -261,9 +276,11 @@ def run_automatic_dataset_pipeline(data: pd.DataFrame, dataset_name: str) -> dic
         )
         set_clustering_run(clustering_run)
         report["clustering"] = "completed"
+        _step(1.00, "Pipeline complete — dashboard ready")
     except Exception as error:
         clear_clustering_run()
         report["clustering"] = f"skipped: {error}"
+        _step(1.00, "Pipeline complete")
 
     return report
 
@@ -279,16 +296,19 @@ def ensure_active_dataset_pipeline(show_spinner: bool = False) -> tuple[bool, di
     if existing_signature == active_signature:
         return False, get_auto_pipeline_report()
 
-    def _run_pipeline() -> dict[str, object]:
+    if show_spinner:
+        progress_bar = st.progress(0.0, text="Initializing analytics pipeline…")
+
+        def _on_progress(pct: float, msg: str) -> None:
+            progress_bar.progress(min(pct, 1.0), text=msg)
+
+        report = run_automatic_dataset_pipeline(data, dataset_name, on_progress=_on_progress)
+        set_auto_pipeline_report(active_signature, report)
+        progress_bar.empty()
+    else:
         report = run_automatic_dataset_pipeline(data, dataset_name)
         set_auto_pipeline_report(active_signature, report)
-        return report
 
-    if show_spinner:
-        with st.spinner("Preprocessing dataset and retraining analytics models..."):
-            report = _run_pipeline()
-    else:
-        report = _run_pipeline()
     return True, report
 
 

@@ -306,7 +306,7 @@ def render_home_kpi_fallback(cards: list[KpiCard]) -> None:
     )
 
 
-def format_hero_metric(value: object, fallback: str = "N/A") -> str:
+def format_hero_metric(value: object, fallback: str = "--%") -> str:
     """Format dynamic hero metrics safely."""
     if value is None:
         return fallback
@@ -505,7 +505,7 @@ def render_home_hero(snapshot: dict[str, object]) -> None:
         snapshot.get("average_absences") if snapshot.get("average_absences") is not None else snapshot.get("average_attendance")
     )
     prediction_accuracy = format_hero_metric(snapshot["prediction_accuracy"])
-    at_risk_count = "N/A" if snapshot["at_risk_count"] is None else f"{snapshot['at_risk_count']:,}"
+    at_risk_count = "--" if snapshot["at_risk_count"] is None else f"{snapshot['at_risk_count']:,}"
     dataset_name = escape(str(snapshot.get("dataset_name", "Uploaded dataset")))
     hero_bars = build_hero_bar_markup(snapshot.get("row_average_scores", pd.Series(dtype="float64")))
 

@@ -5,12 +5,43 @@ from __future__ import annotations
 import streamlit as st
 from streamlit.runtime.scriptrunner import RerunException, StopException
 
-from services.database_service import initialize_storage
+from services.database_service import initialize_storage, get_latest_dataset
 from services.dataset_service import ensure_active_dataset_pipeline
 from ui.pages import PAGE_RENDERERS
 from ui.shell import load_custom_css, render_sidebar
 from utilities.constants import APP_TITLE
-from utilities.dataset_manager import migrate_legacy_session_state
+from utilities.dataset_manager import (
+    build_dataset_signature,
+    has_active_dataset,
+    migrate_legacy_session_state,
+    set_raw_dataset,
+    set_schema_mapping,
+)
+from utilities.schema_mapping import merge_schema_mapping
+
+
+def _restore_dataset_from_sqlite() -> bool:
+    """Load the most recent saved dataset from SQLite when the session is empty.
+
+    Browser navigations start a new WebSocket session and wipe session state.
+    This restores the dataset silently so every page can access it without
+    the user having to re-upload.
+    """
+    if has_active_dataset():
+        return False
+    try:
+        data, file_name, _dataset_id = get_latest_dataset()
+    except Exception:
+        return False
+    if data is None or data.empty:
+        return False
+
+    dataset_name = file_name or "Restored dataset"
+    sig = build_dataset_signature(dataset_name, data)
+    set_raw_dataset(data, dataset_name=dataset_name, source="sqlite", signature=sig)
+    detected_mapping = merge_schema_mapping(data, None)
+    set_schema_mapping(detected_mapping, sig)
+    return True
 
 
 def main() -> None:
@@ -33,7 +64,13 @@ def main() -> None:
         pass
 
     migrate_legacy_session_state()
-    ensure_active_dataset_pipeline(show_spinner=False)
+    restored = _restore_dataset_from_sqlite()
+    if restored:
+        st.toast("Dataset restored from saved records.", icon="✅")
+
+    # show_spinner=True enables the step-by-step progress bar the first time
+    # the pipeline runs for a given dataset (skipped on subsequent navigations).
+    ensure_active_dataset_pipeline(show_spinner=True)
     load_custom_css()
 
     selected_page = render_sidebar()
